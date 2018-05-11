@@ -1,0 +1,44 @@
+
+Login-AzureRMAccount
+
+$subId = (Get-AzureRmSubscription | Out-GridView -Title 'Select Azure Subscription:' -PassThru).Id 
+Select-AzureRmSubscription -SubscriptionId $subId
+
+Select-AzureRmSubscription -SubscriptionId $SubID
+Get-azurermcontext
+
+$srvlist = Import-Csv -Path ($PSScriptRoot + "\testvmlistupdated.csv")
+foreach($srv in $srvlist){
+$rgname = $srv.'RG Name'.Replace(" ","")
+$vmname = $srv.'Host Name'
+$vm = Get-AzureRmVM -ResourceGroupName $rgname -Name $vmname
+$VMSize = "Standard_A1"
+$starttime = get-date -format hh:mm:ss
+Write-host "Starting resize at " $starttime
+
+# Shut down VM
+# VM must be shut down before size change to switch between A/D/DS/Dv2/G/GS/N
+Stop-AzureRmVm -name $vmname -ResourceGroupName $rgname -StayProvisioned -Force
+
+
+# Resize VM 
+$vm = Get-AzureRmVM -ResourceGroupName $rgname -Name $vmname
+$vm.HardwareProfile.VirtualMachineSize = $VMSize
+Update-AzureRmVM -ResourceGroupName $ResourceGroupName -VM $vm
+$endtime = get-date -format hh:mm:ss
+$time = New-TimeSpan -Start $starttime -End $endtime
+write-host "Resize finished. Time to complete: " $time.minutes"minute(s) and "$time.seconds "seconds."
+# Start VM
+Start-AzureRmVm -name $VMName -ResourceGroupName $ResourceGroupName
+
+
+$NewSize = Standard A5
+
+$vmold = Get-AzureRmVM -ResourceGroupName $rgname -Name $vmname
+$vmold | ConvertTo-Json | Out-File -FilePath ($PSScriptRoot + "\" + $vmname + ".json")
+$vm = Get-AzureRmVM -ResourceGroupName $ResourceGroupName -Name $vmname
+$vm.HardwareProfile.vmSize = $NewVMSize
+
+
+Update-AzureRmVM -ResourceGroupName $ResourceGroupName -VM $vm
+Start-AzurermVM -Name $Vm.Name -ResourceGroupName $ResourceGroupName
