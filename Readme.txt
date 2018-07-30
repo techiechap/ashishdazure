@@ -23,7 +23,7 @@ Versioning
 We use GitHub for versioning. For the versions available, see the tags on this repository.
 
 Authors
-Ashish Dhawale - Initial work - PurpleBooth
+Ashish Dhawale - Initial work - 
 See also the list of contributors who participated in this project.
 
 License
